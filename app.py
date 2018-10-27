@@ -15,6 +15,7 @@ def main_thingy():
     thing = json.loads(request.data)
 
     if 'challenge' in thing:
+        print(thing)
         return jsonify({'challenge': thing['challenge']})
 
     print(thing)
