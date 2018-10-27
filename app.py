@@ -17,6 +17,8 @@ def main_thingy():
     if 'challenge' in thing:
         return jsonify({'challenge': thing['challenge']})
 
+    print(thing)
+
 if __name__ == '__main__':
     port = os.getenv('PORT', 5000)
     app.run('0.0.0.0', port=port, debug=True)
