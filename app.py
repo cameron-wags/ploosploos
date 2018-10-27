@@ -1,12 +1,21 @@
 #! /usr/bin/env python3
 import os
-from flask import Flask
+import json
+
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 @app.route('/test')
 def test():
     return 'Sic \'em Bears!'
+
+@app.route('/something_stupid', methods=['POST'])
+def main_thingy():
+    thing = json.loads(request.data)
+
+    if 'challenge' in thing:
+        return jsonify({'challenge': thing['challenge']})
 
 if __name__ == '__main__':
     port = os.getenv('PORT', 5000)
