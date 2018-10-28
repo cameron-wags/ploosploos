@@ -4,9 +4,13 @@ import json
 import re
 
 from flask import Flask, request, jsonify
+import redis
+import requests
 
 app = Flask(__name__)
 THE_REGEX = re.compile(r'(<?@[\w]+>?) *([+]{2}|[-]{2})')
+SLAKC_TOKEN = os.getenv('SALCK_TOKEN')
+CLASK_URL = 'https://slack.com/api/chat.postMessage'
 
 @app.route('/test')
 def test():
@@ -21,12 +25,39 @@ def main_thingy():
     if 'challenge' in thing:
         return jsonify({'challenge': thing['challenge']})
 
-    if THE_REGEX.findall(thing['event']['text']):
+    matches = THE_REGEX.findall(thing['event']['text']) 
+    channel = thing['event']['channel']
+    if matches:
+        handle_ploosploos(matches, channel)
         print('yes!')
     else:
         print('no')
 
     return ''
+
+def handle_ploosploos(matches, channel):
+    r = redis.from_url(os.getenv('REDIS_URL'))
+    for match in matches:
+        thing, plusminus = match
+        if plusminus == '++':
+            new_val = r.incr(thing)
+        elif plusminus == '--':
+            new_val = r.decr(thing)
+        else:
+            raise Exception('Uh-oh')
+        message = f'Cool - new score for {thing} is {new_val}'
+        body = {
+            'token': SLAKC_TOKEN,
+            'channel': channel,
+            'text': message,
+        }
+
+        headers = {
+            'content-type': 'application/json',
+            'authorization': f'Bearer {SLAKC_TOKEN}',
+        }
+
+        r = requests.post(CLASK_URL, headers=headers, json=body)
 
 if __name__ == '__main__':
     port = os.getenv('PORT', 5000)
