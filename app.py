@@ -10,7 +10,7 @@ import requests
 import random
 
 app = Flask(__name__)
-THE_REGEX = re.compile(r'(<?@[\w:]+>?) *([+]{2}|[-]{2})')
+THE_REGEX = re.compile(r'(<?@[\w:+]+>?) *([+]{2}|[-]{2})')
 SLAKC_TOKEN = os.getenv('SALCK_TOKEN')
 CLASK_URL = 'https://slack.com/api/chat.postMessage'
 
