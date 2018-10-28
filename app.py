@@ -14,6 +14,7 @@ CLASK_URL = 'https://slack.com/api/chat.postMessage'
 
 @app.route('/test')
 def test():
+    a = 1
     return 'Sic \'em Bears!'
 
 @app.route('/something_stupid', methods=['POST'])
