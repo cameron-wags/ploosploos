@@ -11,6 +11,7 @@ flask = "*"
 gunicorn = "*"
 requests = "*"
 redis = "*"
+"urllib3" = "*"
 
 
 [dev-packages]
