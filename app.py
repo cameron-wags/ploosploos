@@ -1,10 +1,12 @@
 #! /usr/bin/env python3
 import os
 import json
+import re
 
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
+THE_REGEX = re.compile(r'@(\w)+ *([+]{2}|[-]{2})')
 
 @app.route('/test')
 def test():
@@ -14,11 +16,14 @@ def test():
 def main_thingy():
     thing = json.loads(request.data)
 
+    print(thing)
+
     if 'challenge' in thing:
-        print(thing)
         return jsonify({'challenge': thing['challenge']})
 
-    print(thing)
+    if THE_REGEX.findall(thing['text']):
+        print('yes!')
+
     return ''
 
 if __name__ == '__main__':
