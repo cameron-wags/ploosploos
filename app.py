@@ -42,6 +42,7 @@ def handle_ploosploos(matches, channel):
     r = redis.from_url(os.getenv('REDIS_URL'))
     for match in matches:
         thing, plusminus = match
+        print(f'do a {plusminus} on {thing}')
         if plusminus == '++':
             new_val = r.incr(thing)
             word = cool_synonym()
