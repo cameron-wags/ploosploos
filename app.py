@@ -2,6 +2,7 @@
 import os
 import json
 import re
+from threding import Thread
 
 from flask import Flask, request, jsonify
 import redis
@@ -29,7 +30,8 @@ def main_thingy():
     matches = THE_REGEX.findall(thing['event']['text']) 
     channel = thing['event']['channel']
     if matches:
-        handle_ploosploos(matches, channel)
+        t = Thread(group=None, target=handle_ploosploos, args=(matches, channel))
+        t.start()
         print('yes!')
     else:
         print('no')
@@ -48,6 +50,7 @@ def handle_ploosploos(matches, channel):
             word = uncool_synonym()
         else:
             raise Exception('Uh-oh')
+
         message = f'{word.capitalize()}! New score for {thing} is {new_val}.'
         body = {
             'token': SLAKC_TOKEN,
