@@ -10,7 +10,7 @@ import requests
 import random
 
 app = Flask(__name__)
-THE_REGEX = re.compile(r'(<?@[\w]+>?) *([+]{2}|[-]{2})')
+THE_REGEX = re.compile(r'(<?@[\w:]+>?) *([+]{2}|[-]{2})')
 SLAKC_TOKEN = os.getenv('SALCK_TOKEN')
 CLASK_URL = 'https://slack.com/api/chat.postMessage'
 
@@ -65,6 +65,7 @@ def handle_ploosploos(matches, channel):
         }
 
         response = requests.post(CLASK_URL, headers=headers, json=body)
+        response.raise_for_status()
 
 def cool_synonym():
     return random.choice(['Acceptable', 'Cool', 'excellent', 'exceptional', 'favorable', 'great', 'marvelous', 'positive', 'satisfactory', 'satisfying', 'superb', 'valuable', 'wonderful', 'ace', 'boss', 'bully', 'capital', 'choice', 'crack', 'nice', 'pleasing', 'prime', 'rad', 'sound', 'spanking', 'sterling', 'super', 'superior', 'welcome', 'worthy', 'admirable', 'agreeable', 'commendable', 'congenial', 'deluxe', 'first-class', 'first-rate', 'gnarly', 'gratifying', 'honorable', 'neat', 'precious', 'recherché', 'reputable', 'select', 'shipshape', 'splendid', 'stupendous', 'super-eminent', 'super-excellent', 'tip-top', 'up to snuff'])
