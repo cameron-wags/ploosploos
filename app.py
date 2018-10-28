@@ -21,7 +21,7 @@ def main_thingy():
     if 'challenge' in thing:
         return jsonify({'challenge': thing['challenge']})
 
-    if THE_REGEX.findall(thing['text']):
+    if THE_REGEX.findall(thing['event']['text']):
         print('yes!')
 
     return ''
