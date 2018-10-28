@@ -6,7 +6,7 @@ import re
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-THE_REGEX = re.compile(r'@(\w)+ *([+]{2}|[-]{2})')
+THE_REGEX = re.compile(r'(<?@[\w]+>?) *([+]{2}|[-]{2})')
 
 @app.route('/test')
 def test():
@@ -23,6 +23,8 @@ def main_thingy():
 
     if THE_REGEX.findall(thing['event']['text']):
         print('yes!')
+    else:
+        print('no')
 
     return ''
 
