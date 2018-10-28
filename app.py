@@ -2,7 +2,7 @@
 import os
 import json
 import re
-from threding import Thread
+from threading import Thread
 
 from flask import Flask, request, jsonify
 import redis
