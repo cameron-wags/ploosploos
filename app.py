@@ -6,6 +6,7 @@ import re
 from flask import Flask, request, jsonify
 import redis
 import requests
+import random
 
 app = Flask(__name__)
 THE_REGEX = re.compile(r'(<?@[\w]+>?) *([+]{2}|[-]{2})')
@@ -41,11 +42,13 @@ def handle_ploosploos(matches, channel):
         thing, plusminus = match
         if plusminus == '++':
             new_val = r.incr(thing)
+            word = cool_synonym()
         elif plusminus == '--':
             new_val = r.decr(thing)
+            word = uncool_synonym()
         else:
             raise Exception('Uh-oh')
-        message = f'Cool - new score for {thing} is {new_val}'
+        message = f'{word.capitalize()}! New score for {thing} is {new_val}.'
         body = {
             'token': SLAKC_TOKEN,
             'channel': channel,
@@ -58,6 +61,12 @@ def handle_ploosploos(matches, channel):
         }
 
         r = requests.post(CLASK_URL, headers=headers, json=body)
+
+def cool_synonym():
+    return random.choice(['Acceptable', 'Cool', 'excellent', 'exceptional', 'favorable', 'great', 'marvelous', 'positive', 'satisfactory', 'satisfying', 'superb', 'valuable', 'wonderful', 'ace', 'boss', 'bully', 'capital', 'choice', 'crack', 'nice', 'pleasing', 'prime', 'rad', 'sound', 'spanking', 'sterling', 'super', 'superior', 'welcome', 'worthy', 'admirable', 'agreeable', 'commendable', 'congenial', 'deluxe', 'first-class', 'first-rate', 'gnarly', 'gratifying', 'honorable', 'neat', 'precious', 'recherché', 'reputable', 'select', 'shipshape', 'splendid', 'stupendous', 'super-eminent', 'super-excellent', 'tip-top', 'up to snuff'])
+
+def uncool_synonym():
+    return random.choice(['abhorrent', 'abominable', 'beastly', 'bitchy', 'creepy', 'deplorable', 'detestable', 'disgusting', 'execrable', 'gross', 'hideous', 'horrible', 'invidious', 'lousy', 'nasty', 'nauseating', 'obnoxious', 'odious', 'offensive', 'pesky', 'pestiferous', 'repellent', 'repugnant', 'repulsive', 'revolting', 'sleazy', 'slimy', 'uncool', 'vile'])
 
 if __name__ == '__main__':
     port = os.getenv('PORT', 5000)
