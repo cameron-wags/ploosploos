@@ -13,6 +13,8 @@ app = Flask(__name__)
 THE_REGEX = re.compile(r'(<?@[\w:+-]+>?) *([+]{2}|[-]{2})')
 SLAKC_TOKEN = os.getenv('SALCK_TOKEN')
 CLASK_URL = 'https://slack.com/api/chat.postMessage'
+# It actually doesn't matter if someone ++'s this, they'd have to be fast.
+SOMETHING_NO_ONE_WILL_EVER_SAY = 'last_event_id'
 
 @app.route('/test')
 def test():
@@ -29,8 +31,9 @@ def main_thingy():
 
     matches = THE_REGEX.findall(thing['event']['text']) 
     channel = thing['event']['channel']
+    event_id = thing['event_id']
     if matches:
-        t = Thread(group=None, target=handle_ploosploos, args=(matches, channel))
+        t = Thread(group=None, target=handle_ploosploos, args=(matches, channel, event_id))
         t.start()
         print('yes!')
     else:
@@ -38,8 +41,13 @@ def main_thingy():
 
     return ''
 
-def handle_ploosploos(matches, channel):
+def handle_ploosploos(matches, channel, event_id):
     r = redis.from_url(os.getenv('REDIS_URL'))
+
+    if event_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
+        pass
+    r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, event_id)
+
     for match in matches:
         thing, plusminus = match
         if thing.startswith('@'):
