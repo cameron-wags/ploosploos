@@ -49,7 +49,7 @@ def handle_leaderboard(channel, event_id):
     r = redis.from_url(os.getenv('REDIS_URL'))
 
     if event_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
-        pass
+        return
     r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, event_id)
 
     # todo get a summary of all numeric keys from redis, however that happens
@@ -74,7 +74,7 @@ def handle_ploosploos(matches, channel, event_id):
     r = redis.from_url(os.getenv('REDIS_URL'))
 
     if event_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
-        pass
+        return
     r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, event_id)
 
     for match in matches:
