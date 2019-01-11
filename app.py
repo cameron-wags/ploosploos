@@ -32,25 +32,25 @@ def main_thingy():
 
     matches = THE_REGEX.findall(thing['event']['text']) 
     channel = thing['event']['channel']
-    event_id = thing['event_id']
+    msg_id = thing['client_msg_id']
     if matches:
-        t = Thread(group=None, target=handle_ploosploos, args=(matches, channel, event_id))
+        t = Thread(group=None, target=handle_ploosploos, args=(matches, channel, msg_id))
         t.start()
         print('yes!')
     elif LEADERBROAD_REXEG.match(thing['event']['text']):
-        t = Thread(group=None, target=handle_leaderboard, args=(channel, event_id))
+        t = Thread(group=None, target=handle_leaderboard, args=(channel, msg_id))
         t.start()
     else:
         print('no')
 
     return ''
 
-def handle_leaderboard(channel, event_id):
+def handle_leaderboard(channel, msg_id):
     r = redis.from_url(os.getenv('REDIS_URL'))
 
-    if event_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
+    if msg_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
         return
-    r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, event_id)
+    r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, msg_id)
 
     # todo get a summary of all numeric keys from redis, however that happens
     message = f'{uncool_synonym().capitalize()}, Cameron and Matt haven\'t made a leaderboard yet!'
@@ -70,12 +70,12 @@ def handle_leaderboard(channel, event_id):
     response.raise_for_status()
 
 
-def handle_ploosploos(matches, channel, event_id):
+def handle_ploosploos(matches, channel, msg_id):
     r = redis.from_url(os.getenv('REDIS_URL'))
 
-    if event_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
+    if msg_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
         return
-    r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, event_id)
+    r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, msg_id)
 
     for match in matches:
         thing, plusminus = match
