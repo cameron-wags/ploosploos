@@ -2,7 +2,7 @@
 import os
 import json
 import re
-from threading import Thread
+from threading import Thread, Lock
 
 from flask import Flask, request, jsonify
 import redis
@@ -16,6 +16,7 @@ SLAKC_TOKEN = os.getenv('SALCK_TOKEN')
 CLASK_URL = 'https://slack.com/api/chat.postMessage'
 # It actually doesn't matter if someone ++'s this, they'd have to be fast.
 SOMETHING_NO_ONE_WILL_EVER_SAY = 'last_event_id'
+pp_lock = Lock()
 
 @app.route('/test')
 def test():
@@ -71,11 +72,15 @@ def handle_leaderboard(channel, msg_id):
 
 
 def handle_ploosploos(matches, channel, msg_id):
+    global pp_lock
+
+    pp_lock.acquire()
     r = redis.from_url(os.getenv('REDIS_URL'))
 
     if msg_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
         return
     r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, msg_id)
+    pp_lock.release()
 
     for match in matches:
         thing, plusminus = match
