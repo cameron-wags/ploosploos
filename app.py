@@ -33,7 +33,7 @@ def main_thingy():
 
     matches = THE_REGEX.findall(thing['event']['text']) 
     channel = thing['event']['channel']
-    msg_id = str(thing['event']['client_msg_id'], encoding='utf8')
+    msg_id = thing['event']['client_msg_id']
     if matches:
         t = Thread(group=None, target=handle_ploosploos, args=(matches, channel, msg_id))
         t.start()
@@ -49,7 +49,7 @@ def main_thingy():
 def handle_leaderboard(channel, msg_id):
     r = redis.from_url(os.getenv('REDIS_URL'))
 
-    if msg_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
+    if msg_id == str(r.get(SOMETHING_NO_ONE_WILL_EVER_SAY), encoding='utf8'):
         return
     r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, msg_id)
 
@@ -77,7 +77,7 @@ def handle_ploosploos(matches, channel, msg_id):
     pp_lock.acquire()
     r = redis.from_url(os.getenv('REDIS_URL'))
 
-    if msg_id == r.get(SOMETHING_NO_ONE_WILL_EVER_SAY):
+    if msg_id == str(r.get(SOMETHING_NO_ONE_WILL_EVER_SAY), encoding='utf8'):
         return
     r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, msg_id)
     pp_lock.release()
