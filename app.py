@@ -78,6 +78,7 @@ def handle_ploosploos(matches, channel, msg_id):
     r = redis.from_url(os.getenv('REDIS_URL'))
 
     if msg_id == str(r.get(SOMETHING_NO_ONE_WILL_EVER_SAY), encoding='utf8'):
+        pp_lock.release()
         return
     r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, msg_id)
     pp_lock.release()
