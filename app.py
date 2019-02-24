@@ -33,7 +33,7 @@ def main_thingy():
 
     matches = THE_REGEX.findall(thing['event']['text']) 
     channel = thing['event']['channel']
-    msg_id = thing['event']['client_msg_id']
+    msg_id = str(thing['event']['client_msg_id'], encoding='utf8')
     if matches:
         t = Thread(group=None, target=handle_ploosploos, args=(matches, channel, msg_id))
         t.start()
