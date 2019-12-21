@@ -11,7 +11,8 @@ import random
 
 app = Flask(__name__)
 THE_REGEX = re.compile(r'(<?@[\w:+-]+>?) *([+]{2}|[-]{2})')
-LEADERBROAD_REXEG = re.compile(r'ploosploos (scores?|leaderboard|count)')
+# Maybe don't hardcode the bot's id later on
+LEADERBROAD_REXEG = re.compile(r'(<@UDPR09T7E>|ploosploos) *(scores?|leaderboard|count|top|list) *(-?\d+)?', flags=re.IGNORECASE)
 SLAKC_TOKEN = os.getenv('SALCK_TOKEN')
 CLASK_URL = 'https://slack.com/api/chat.postMessage'
 # It actually doesn't matter if someone ++'s this, they'd have to be fast.
@@ -38,31 +39,46 @@ def main_thingy():
         t = Thread(group=None, target=handle_ploosploos, args=(matches, channel, msg_id))
         t.start()
         print('yes!')
-    elif LEADERBROAD_REXEG.match(thing['event']['text']):
-        t = Thread(group=None, target=handle_leaderboard, args=(channel, msg_id))
-        t.start()
     else:
-        print('no')
+        scoreMatch = LEADERBROAD_REXEG.match(thing['event']['text'])
+        if scoreMatch:
+            t = Thread(group=None, target=handle_leaderboard, args=(scoreMatch, channel, msg_id))
+            t.start()
+            print('leaderboard!')
+        else:
+            print('no')
 
     return ''
 
-def handle_leaderboard(channel, msg_id):
+def handle_leaderboard(match, channel, msg_id):
     r = redis.from_url(os.getenv('REDIS_URL'))
 
     if msg_id == str(r.get(SOMETHING_NO_ONE_WILL_EVER_SAY), encoding='utf8'):
         return
     r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, msg_id)
 
-    # todo get a summary of all numeric keys from redis, however that happens
-
-    message = ''
     # this is a bad idea
-    keys = r.keys()
-    pairs = { key:r.get(key) for key in keys }
-    for item in sorted(pairs, key=pairs.get, reverse=True)[:5]:
-        message += f'{key}: {pairs[key]}\n'
+    keys = [ str(key, encoding='utf8') for key in r.keys() ]
+    keys.remove(SOMETHING_NO_ONE_WILL_EVER_SAY)
+    print(keys)
 
-    # message = f'{uncool_synonym().capitalize()}, Cameron and Matt haven\'t made a leaderboard yet!'
+    requested_count = int(match.group(3)) if match.lastindex == 3 else 5
+    top = requested_count > 0
+    count = abs(requested_count) if abs(requested_count) <= len(keys) else keys.count
+
+
+    pairs = { key:int(str(r.get(key), encoding='utf8')) for key in keys }
+    print(pairs)
+
+    if count == 0:
+        message = f'{uncool_synonym().capitalize()}!'
+    else:
+        high_low = 'Top' if top else 'Bottom'
+        message = f'{cool_synonym().capitalize()}! {high_low} *{count}* scores:\n'
+
+    for key in sorted(pairs, key=pairs.get, reverse=top)[:count]:
+        message += f'{key}: *{pairs[key]}*\n'
+        print(f'{key} -> {pairs[key]}')
 
     body = {
             'token': SLAKC_TOKEN,
