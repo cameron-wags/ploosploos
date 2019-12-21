@@ -11,7 +11,7 @@ import random
 
 app = Flask(__name__)
 THE_REGEX = re.compile(r'(<?@[\w:+-]+>?) *([+]{2}|[-]{2})')
-LEADERBROAD_REXEG = re.compile(r'/ploosploos (scores?|leaderboard|count)')
+LEADERBROAD_REXEG = re.compile(r'ploosploos (scores?|leaderboard|count)')
 SLAKC_TOKEN = os.getenv('SALCK_TOKEN')
 CLASK_URL = 'https://slack.com/api/chat.postMessage'
 # It actually doesn't matter if someone ++'s this, they'd have to be fast.
@@ -54,7 +54,15 @@ def handle_leaderboard(channel, msg_id):
     r.set(SOMETHING_NO_ONE_WILL_EVER_SAY, msg_id)
 
     # todo get a summary of all numeric keys from redis, however that happens
-    message = f'{uncool_synonym().capitalize()}, Cameron and Matt haven\'t made a leaderboard yet!'
+
+    message = ''
+    # this is a bad idea
+    keys = r.keys()
+    pairs = { key:r.get(key) for key in keys }
+    for item in sorted(pairs, key=pairs.get, reverse=True)[:5]:
+        message += f'{key}: {pairs[key]}\n'
+
+    # message = f'{uncool_synonym().capitalize()}, Cameron and Matt haven\'t made a leaderboard yet!'
 
     body = {
             'token': SLAKC_TOKEN,
